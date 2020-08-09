@@ -19,7 +19,22 @@ export default class GradesController{
     await fs.writeFile(archive, JSON.stringify(data, null, 2));
 
     response.json(data)
+  }
 
+  async update(request: Request , response: Response){
+    const { student, subject, type ,value }= request.body;
+    const { id }= request.params;
 
+    let data = JSON.parse((await fs.readFile(archive)).toString());
+    
+    const newGrade = {id:data.nextId , ...{student, subject,type, value, timestamp: new Date()} }
+    
+    data.grades.push(newGrade);
+
+    data = {nextId: data.nextId++, ...data }
+
+    await fs.writeFile(archive, JSON.stringify(data, null, 2));
+
+    response.json(data)
   }
 }
