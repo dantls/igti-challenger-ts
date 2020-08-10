@@ -1,6 +1,8 @@
 import {Request, Response} from 'express'
 import {promises as fs} from 'fs';
 import path from 'path';
+import { average } from '../utils/average';
+import { sum } from '../utils/sum';
 
 const archive = path.resolve(__dirname,'..','..', 'grades.json');
 
@@ -96,5 +98,37 @@ export default class GradesController{
       response.status(400).json({error: "Grade not found."}); 
     }
   }
-  
+
+  async calcAverage(request: Request , response: Response){
+    console.log(request.query);
+    const {subject, type} = request.query;
+
+    if(!subject){
+      return response.json({message:`Subject doesn't found.`});
+    }
+    if(!type){
+      return response.json({message:`Type doesn't found.`});
+    }console.log()
+    const data = JSON.parse((await fs.readFile(archive)).toString());
+
+    const avg = average(data.grades,String(type),String(subject));
+    response.json(avg);
+  }
+
+  async calcSum(request: Request , response: Response){
+    console.log(request.query);
+    const {student, subject} = request.query;
+
+    if(!student){
+      return response.json({message:`Student doesn't found.`});
+    }
+    if(!subject){
+      return response.json({message:`Type doesn't found.`});
+    }console.log()
+    const data = JSON.parse((await fs.readFile(archive)).toString());
+
+    const ammount = sum(data.grades,String(student),String(subject));
+    response.json(ammount);
+  }
+
 }
